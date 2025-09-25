@@ -70,9 +70,8 @@ def getTestOptions() -> tuple[pathlib.Path, int, bool]:
 
     return modelPath, numberOfTestImages, showTestDataFeedback
 
-def shapeData(image: np.ndarray) -> np.ndarray:
-    resizedImage: np.ndarray = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE))
-    normalizedImage: np.ndarray = resizedImage.astype(np.float32) / 255.0
+def normalizeData(image: np.ndarray) -> np.ndarray:
+    normalizedImage: np.ndarray = image.astype(np.float32) / 255.0
     return normalizedImage
 
 def testModel(modelPath: pathlib.Path, testImagesAmount: int, show=False) -> None:
@@ -90,11 +89,11 @@ def testModel(modelPath: pathlib.Path, testImagesAmount: int, show=False) -> Non
 
     print('Testing model on test dataset...')
     for i, (inputImage, outputImage) in enumerate(zip(inputImages, outputImages)):
-        shapedInputImage: np.ndarray = shapeData(inputImage)
-        shapeOutputImage: np.ndarray = shapeData(outputImage)
+        normalizedInputImage: np.ndarray = normalizeData(inputImage)
+        normalizedOutputImage: np.ndarray = normalizeData(outputImage)
 
-        inputImageTensor: torch.Tensor = torch.from_numpy(shapedInputImage).float().unsqueeze(0)
-        outputImageTensor: torch.Tensor = torch.from_numpy(shapeOutputImage).float().unsqueeze(0)
+        inputImageTensor: torch.Tensor = torch.from_numpy(normalizedInputImage).float().unsqueeze(0)
+        outputImageTensor: torch.Tensor = torch.from_numpy(normalizedOutputImage).float().unsqueeze(0)
 
         with torch.no_grad():
             predictedImageTensor: torch.Tensor = model(inputImageTensor)
@@ -111,11 +110,11 @@ def testModel(modelPath: pathlib.Path, testImagesAmount: int, show=False) -> Non
             fig, axes = plt.subplots(1, 3, figsize=(12, 4))
             fig.suptitle('Prediction Comparison', fontsize=16)
 
-            axes[0].imshow(shapedInputImage, cmap='gray')
+            axes[0].imshow(normalizedInputImage, cmap='gray')
             axes[0].set_title('Input')
             axes[0].axis('off')
 
-            axes[1].imshow(shapeOutputImage, cmap='gray')
+            axes[1].imshow(normalizedOutputImage, cmap='gray')
             axes[1].set_title('Expected Output')
             axes[1].axis('off')
 

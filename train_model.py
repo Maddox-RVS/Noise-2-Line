@@ -77,18 +77,20 @@ class Model(nn.Module):
     def __init__(self):
         super().__init__()
         self.flatten: nn.Flatten = nn.Flatten()
-        self.linear_relu_stack: nn.Sequential = nn.Sequential(
-            nn.Linear(int(math.pow(IMG_SIZE, 2)) * 3, 512),
+        self.convLayers: nn.Sequential = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.Linear(512, 512),
+            nn.Conv2d(32, 64, kernel_size=3, padding=1),
             nn.ReLU(),
-            nn.Linear(512, int(math.pow(IMG_SIZE, 2)) * 3),
+            nn.Conv2d(64, 32, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 3, kernel_size=3, padding=1),
             nn.Sigmoid())
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.flatten(x)
-        x = self.linear_relu_stack(x)
-        x = x.view(-1, IMG_SIZE, IMG_SIZE, 3)
+        x = x.permute(0, 3, 1, 2)
+        x = self.convLayers(x)
+        x = x.permute(0, 2, 3, 1)
         return x
     
 def trainModel(model: nn.Module, dataloader: DataLoader, epochs: int, learningRate: float) -> None:
