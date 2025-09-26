@@ -86,6 +86,10 @@ def testModel(modelPath: pathlib.Path, testImagesAmount: int, show=False) -> Non
     model.load_state_dict(torch.load(modelPath))
     model.eval()
 
+    device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    print(f'Model moved to {device}.')
+
     print('Generating test dataset...')
     inputImages, outputImages = generateData(testImagesAmount)
     print('Test dataset generation complete.')

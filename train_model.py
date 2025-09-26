@@ -89,6 +89,10 @@ class Model(nn.Module):
         return x
     
 def trainModel(model: nn.Module, dataloader: DataLoader, epochs: int, learningRate: float) -> None:
+    device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    print(f'Model moved to {device}.')
+    
     optimizer: torch.optim.Adam = torch.optim.Adam(model.parameters(), lr=learningRate)
     criterion: nn.MSELoss = nn.MSELoss()
     model.train()
@@ -99,6 +103,9 @@ def trainModel(model: nn.Module, dataloader: DataLoader, epochs: int, learningRa
         print(f'<----- Starting epoch {epoch + 1}/{epochs} ----->')
 
         for batchIndex, (inputs, targets)  in enumerate(dataloader):
+            inputs: torch.Tensor = inputs.to(device)
+            targets: torch.Tensor = targets.to(device)
+
             optimizer.zero_grad()
             modelOutputs: torch.Tensor = model(inputs)
             loss: torch.Tensor = criterion(modelOutputs, targets)
