@@ -4,7 +4,7 @@ import cv2
 import shutil
 
 DATASET_SIZE: int = 1000
-IMAGE_SIZE: int = 16
+IMAGE_SIZE: int = 64
 
 def generateData(datasetSize: int) -> tuple[list[np.ndarray], list[np.ndarray]]:
     inputImages: list[np.ndarray] = []
@@ -13,23 +13,39 @@ def generateData(datasetSize: int) -> tuple[list[np.ndarray], list[np.ndarray]]:
     print('Generating dataset...')
     for i in range(datasetSize):    
         inputImage: np.ndarray = np.ones((IMAGE_SIZE, IMAGE_SIZE, 3), dtype=np.uint8) * 255
+        outputImage: np.ndarray = inputImage.copy()
         
-        redPixelProb: float = 0.90
-        redPixels: list[tuple[int, int]] = []
+        numLines: int = np.random.randint(1, 11)
 
-        x, y = np.random.randint(0, IMAGE_SIZE, size=2)
-        redPixels.append((x, y))
-        while (np.random.rand() < redPixelProb):
-            x, y = np.random.randint(0, IMAGE_SIZE, size=2)
-            redPixels.append((x, y))
+        for x in range(IMAGE_SIZE):
+            for y in range(IMAGE_SIZE):
+                randomRedChannel: int = np.random.randint(0, 256)
+                randomGreenChannel: int = np.random.randint(0, 256)
+                randomBlueChannel: int = np.random.randint(0, 256)
+                inputImage[y, x] = [randomRedChannel, randomGreenChannel, randomBlueChannel]
 
-        for (x, y) in redPixels:
-            inputImage[x, y] = [0, 0, 0]
+        for j in range(numLines):
+            point1x: int = np.random.randint(0, IMAGE_SIZE)
+            point1y: int = np.random.randint(0, IMAGE_SIZE)
+
+            point2x: int = np.random.randint(0, IMAGE_SIZE)
+            point2y: int = np.random.randint(0, IMAGE_SIZE)
+
+            thickness: int = np.random.randint(1, 6)
+
+            cv2.line(inputImage, (point1x, point1y), (point2x, point2y), (255, 255, 255), thickness)
+            cv2.line(outputImage, (point1x, point1y), (point2x, point2y), (0, 0, 0), thickness)
+
+        for x in range(IMAGE_SIZE):
+            for y in range(IMAGE_SIZE):
+                pixelChangeProbability: float = np.random.rand()
+                if pixelChangeProbability > 0.8:
+                    randomRedChannel: int = np.random.randint(0, 256)
+                    randomGreenChannel: int = np.random.randint(0, 256)
+                    randomBlueChannel: int = np.random.randint(0, 256)
+                    inputImage[y, x] = [randomRedChannel, randomGreenChannel, randomBlueChannel]
+
         inputImages.append(inputImage)
-
-        outputImage: np.ndarray = np.ones((IMAGE_SIZE, IMAGE_SIZE, 3), dtype=np.uint8) * 255
-        for (x, y) in redPixels:
-            outputImage[x, y] = [255, 0, 0]
         outputImages.append(outputImage)
 
         print(f'Generated {i + 1}/{datasetSize} images', end='\r')

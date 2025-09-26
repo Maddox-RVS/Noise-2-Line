@@ -7,7 +7,6 @@ import torch
 import cv2
 
 MODELS_SAVE_PATH: pathlib.Path = pathlib.Path("models_out")
-IMAGE_SIZE: int = 16
 
 def calculateSimilarity(outputImageTensor: torch.Tensor, predictedImageTensor: torch.Tensor) -> float:
     outputRedPixels: int = 0
@@ -32,7 +31,11 @@ def calculateSimilarity(outputImageTensor: torch.Tensor, predictedImageTensor: t
                 if red >= 0.5 and green <= 0.5 and blue <= 0.5:
                     predictedRedPixels += 1
 
-    return (outputRedPixels / predictedRedPixels) * 100.0 if predictedRedPixels > 0 else 0.0
+    difference: float = abs(outputRedPixels - predictedRedPixels)
+    totalPixels: int = outputImageTensor.shape[0] * outputImageTensor.shape[1]
+    similarity: float = 100.0 - ((difference / totalPixels) * 100.0)
+
+    return similarity
 
 def getTestOptions() -> tuple[pathlib.Path, int, bool]:
     modelName: str = ''

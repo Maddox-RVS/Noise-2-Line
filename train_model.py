@@ -7,8 +7,7 @@ import math
 import cv2
 
 MODELS_SAVE_PATH: pathlib.Path = pathlib.Path("models_out")
-IMG_SIZE: int = 16
-EPOCHS: int = 800
+EPOCHS: int = 350
 LEARNING_RATE: float = 0.00005
 
 def loadImages(imagesPath: pathlib.Path) -> list[np.ndarray]:
@@ -48,7 +47,6 @@ def openDataset(inputImagesPath: pathlib.Path, outputImagesPath: pathlib.Path) -
 class ImageDataset(torch.utils.data.Dataset):
     def __init__(self, inputImages: pathlib.Path, outputImages: pathlib.Path):
         self.inputImages, self.outputImages = openDataset(inputImages, outputImages)
-        self.imgSize = IMG_SIZE
 
     def __len__(self) -> int:
         return len(self.inputImages)
@@ -57,11 +55,8 @@ class ImageDataset(torch.utils.data.Dataset):
         inputImage: np.ndarray = self.inputImages[idx]
         outputImage: np.ndarray = self.outputImages[idx]
 
-        resizedInputImage: np.ndarray = cv2.resize(inputImage, (self.imgSize, self.imgSize))
-        resizedOutputImage: np.ndarray = cv2.resize(outputImage, (self.imgSize, self.imgSize))
-
-        inputTensor: torch.Tensor = torch.from_numpy(resizedInputImage).float()
-        outputTensor: torch.Tensor = torch.from_numpy(resizedOutputImage).float()
+        inputTensor: torch.Tensor = torch.from_numpy(inputImage).float()
+        outputTensor: torch.Tensor = torch.from_numpy(outputImage).float()
 
         inputTensor /= 255.0
         outputTensor /= 255.0
