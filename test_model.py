@@ -8,32 +8,10 @@ import cv2
 
 MODELS_SAVE_PATH: pathlib.Path = pathlib.Path("models_out")
 
-def calculateSimilarity(outputImageTensor: torch.Tensor, predictedImageTensor: torch.Tensor) -> float:
-    outputRedPixels: int = 0
-    for i in range(outputImageTensor.shape[0]):
-        for j in range(outputImageTensor.shape[1]):
-            for k in range(outputImageTensor.shape[2]):
-                value = outputImageTensor[i, j, k]
-                red: float = value[0].item()
-                green: float = value[1].item()
-                blue: float = value[2].item()
-                if red == 1.0 and green == 0.0 and blue == 0.0:
-                    outputRedPixels += 1
-
-    predictedRedPixels: int = 0
-    for i in range(predictedImageTensor.shape[0]):
-        for j in range(predictedImageTensor.shape[1]):
-            for k in range(predictedImageTensor.shape[2]):
-                value = predictedImageTensor[i, j, k]
-                red: float = value[0].item()
-                green: float = value[1].item()
-                blue: float = value[2].item()
-                if red >= 0.5 and green <= 0.5 and blue <= 0.5:
-                    predictedRedPixels += 1
-
-    difference: float = abs(outputRedPixels - predictedRedPixels)
-    totalPixels: int = outputImageTensor.shape[0] * outputImageTensor.shape[1]
-    similarity: float = 100.0 - ((difference / totalPixels) * 100.0)
+def calculateSimilarity(outputImageTensor: torch.Tensor, predictedImageTensor: torch.Tensor) -> float: 
+    totalPixels = outputImageTensor.shape[1] * outputImageTensor.shape[2]
+    difference: float = torch.sum(torch.abs(outputImageTensor - predictedImageTensor)).item() / totalPixels
+    similarity: float = 100.0 - (difference * 100.0)
 
     return similarity
 
@@ -82,13 +60,11 @@ def testModel(modelPath: pathlib.Path, testImagesAmount: int, show=False) -> Non
         raise FileNotFoundError(f'Model file not found at {modelPath}.')
     
     print(f'Loading model from {modelPath}...')
-    model: Model = Model()
-    model.load_state_dict(torch.load(modelPath))
-    model.eval()
-
     device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model.to(device)
+    model: Model = Model()
+    model.load_state_dict(torch.load(modelPath, map_location=torch.device(device)))
     print(f'Model moved to {device}.')
+    model.eval()
 
     print('Generating test dataset...')
     inputImages, outputImages = generateData(testImagesAmount)
@@ -101,6 +77,9 @@ def testModel(modelPath: pathlib.Path, testImagesAmount: int, show=False) -> Non
 
         inputImageTensor: torch.Tensor = torch.from_numpy(normalizedInputImage).float().unsqueeze(0)
         outputImageTensor: torch.Tensor = torch.from_numpy(normalizedOutputImage).float().unsqueeze(0)
+
+        inputImageTensor = inputImageTensor.to(device)
+        outputImageTensor = outputImageTensor.to(device)
 
         with torch.no_grad():
             predictedImageTensor: torch.Tensor = model(inputImageTensor)
