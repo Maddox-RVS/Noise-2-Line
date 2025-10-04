@@ -5,18 +5,18 @@
 Noise2Lines is a deep learning project that trains neural networks to convert noisy, colorful images into clean line drawings. The project demonstrates pixel-level image transformation using convolutional neural networks, where the model learns to identify and extract line patterns from complex, noisy input images.
 
 <div align="center">
-    <img src="resources/Screenshot 01.png" width="500">
-    <img src="resources/Screenshot 03.png" width="510">
+    <img src="resources/Screenshot 01.png" width="300">
+    <img src="resources/Screenshot 03.png" width="310">
 </div>
 
 <div align="center">
-    <img src="resources/Screenshot 04.png" width="500">
-    <img src="resources/Screenshot 05.png" width="505">
+    <img src="resources/Screenshot 04.png" width="300">
+    <img src="resources/Screenshot 05.png" width="305">
 </div>
 
 <div align="center">
-    <img src="resources/Screenshot 07.png" width="500">
-    <img src="resources/Screenshot 08.png" width="505">
+    <img src="resources/Screenshot 07.png" width="300">
+    <img src="resources/Screenshot 08.png" width="305">
 </div>
 
 ## Prerequisites
