@@ -21,7 +21,7 @@ Noise2Lines is a deep learning project that trains neural networks to convert no
 
 ## Prerequisites
 
-Before using the Python Reddit Nuker, ensure that you have the following:
+Before using the this program, ensure that you have the following:
 
 1. Python: The program requires **Python (3.13.5 recommended)** to be installed on your system. You can download Python from the official Python website: [python.org](https://www.python.org).
 2. [Anaconda or Miniconda](https://www.anaconda.com/docs/main) (recommended for managing environments).
@@ -36,7 +36,7 @@ If you just want the finished model, you can find it in the root directory of th
 
 ## Setup
 
-To set up the Python Reddit Nuker program, follow these steps:
+To set up the Noise2Lines program, follow these steps:
 
 1. **Clone the repository using git:**
 
